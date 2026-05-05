@@ -1,0 +1,61 @@
+services:
+  homarr:
+    container_name: homarr
+    image: homarr/homarr
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    volumes:
+      - ./homarr/configs:/app/data/configs
+      - ./homarr/icons:/app/public/icons
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  vaultwarden:
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    restart: always
+    environment:
+      - SIGNUPS_ALLOWED=false # Ändra till true när du skapat ditt konto
+    volumes:
+      - ./vaultwarden:/data
+    ports:
+      - "8080:80"
+
+  nextcloud:
+    container_name: nextcloud
+    image: nextcloud:latest
+    restart: always
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=ditt_lösenord
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  plex:
+    container_name: plex
+    image: linuxserver/plex
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PLEX_CLAIM=claim-TOKEN_HÄR
+      - TZ=Europe/Stockholm
+    volumes:
+      - ./plex/config:/config
+      - /sökväg/till/media:/data/media
+
+  koel:
+    container_name: koel
+    image: koel/koel:latest
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - ADMIN_EMAIL=din@email.com
+      - ADMIN_PASSWORD=ditt_lösenord
+    volumes:
+      - /sökväg/till/musik:/music
