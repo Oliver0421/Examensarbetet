@@ -1,61 +1,75 @@
+
 services:
+
+
   homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
     container_name: homarr
-    image: homarr/homarr
     restart: unless-stopped
+    networks:
+      - homelab
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  
+      - ./data/homarr/appdata:/appdata
+    environment:
+      - SECRET_ENCRYPTION_KEY="Måste ändras" 
+      - TZ=Europe/Stockholm
     ports:
       - "7575:7575"
-    volumes:
-      - ./homarr/configs:/app/data/configs
-      - ./homarr/icons:/app/public/icons
-      - /var/run/docker.sock:/var/run/docker.sock
+
 
   vaultwarden:
-    container_name: vaultwarden
     image: vaultwarden/server:latest
-    restart: always
-    environment:
-      - SIGNUPS_ALLOWED=false # Ändra till true när du skapat ditt konto
+    container_name: vaultwarden
+    restart: unless-stopped
+    networks:
+      - homelab
     volumes:
-      - ./vaultwarden:/data
+      - ./data/vaultwarden:/data
+    environment:
+      - DOMAIN=http://localhost:8080       
+      - SIGNUPS_ALLOWED=true              
+      - TZ=Europe/Stockholm
     ports:
       - "8080:80"
 
-  nextcloud:
-    container_name: nextcloud
-    image: nextcloud:latest
-    restart: always
-    ports:
-      - "8081:80"
-    volumes:
-      - ./nextcloud:/var/www/html
-    environment:
-      - MYSQL_PASSWORD=ditt_lösenord
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-
+  
   plex:
+    image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    image: linuxserver/plex
     restart: unless-stopped
+    networks:
+      - homelab
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+      - VERSION=docker
+      - PLEX_CLAIM="Måste ändras"
+    volumes:
+      - ./data/plex/config:/config
+      - ./data/plex/transcode:/transcode
+      - ./data/plex/media:/media   
+    ports:
+      - "32400:32400"
+
+
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - ./data/home-assistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
     network_mode: host
     environment:
-      - PLEX_CLAIM=claim-TOKEN_HÄR
-      - TZ=Europe/Stockholm
-    volumes:
-      - ./plex/config:/config
-      - /sökväg/till/media:/data/media
+      TZ: Sweden/Stockholm 
 
-  koel:
-    container_name: koel
-    image: koel/koel:latest
-    restart: always
-    ports:
-      - "8082:80"
-    environment:
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - ADMIN_EMAIL=din@email.com
-      - ADMIN_PASSWORD=ditt_lösenord
-    volumes:
-      - /sökväg/till/musik:/music
+
+networks:
+  homelab:
+    name: homelab
+    driver: bridge
