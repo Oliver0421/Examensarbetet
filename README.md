@@ -70,4 +70,4 @@ vaultwarden:
       - "8080:80"
 
 ```
-## Det var nog det 👍👌👊 : )
+## Slutet 👍 : )
