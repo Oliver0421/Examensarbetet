@@ -10,7 +10,9 @@
 
 ` openssl rand -hex 32 ` I terminalen 
 
-### och lägg till den här 
+### Lägg sedan till den i kommande SECRET_ENCRYPTION
+
+### Viktiga delar är image. Mn måste hitta befintliga uppdaterade images från docker hub 
 
 ```
  homarr:
