@@ -4,7 +4,7 @@
 
 ### Vissa credentials är borta från Plex, Vaultwarden b.l.a
 
-#### Om du vill testa yml filen så 
+#### Om man vill testa yml filen så 
 
 #### Homarr behöver en crypterings nyckel så 
 
@@ -72,4 +72,4 @@ vaultwarden:
       - "8080:80"
 
 ```
-## Slutet 👍 : )
+## Slutet 👍
