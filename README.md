@@ -14,6 +14,8 @@
 
 ### Viktiga delar är image. Hitta befintliga uppdaterade images från docker hub, ifall det inte fungerar
 
+### Vad jag lade till i Docker Compose 
+
 ```
  homarr:
     image: ghcr.io/homarr-labs/homarr:latest
@@ -73,3 +75,46 @@ vaultwarden:
 
 ```
 ## Slutet 👍
+
+## Eller lite mer 
+
+```
+ollama:
+    networks:
+      - homelab
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+    entrypoint: ["/bin/sh", "-c", "ollama serve & sleep 10 && ollama pull llama3 && wait"]   
+    
+    restart: unless-stopped
+
+```
+
+
+```
+ open-webui:
+    networks:
+      - homelab
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+
+    volumes:
+      - openwebui_data:/app/backend/data
+    depends_on:
+      - ollama
+    restart: unless-stopped
+```
+
+### Ollama till grafiskt gränssnitt 
+
